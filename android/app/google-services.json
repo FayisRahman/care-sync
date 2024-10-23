@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "717516224195",
+    "project_id": "caresync-34f54",
+    "storage_bucket": "caresync-34f54.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:717516224195:android:8fd653b07ee6ca7907d476",
+        "android_client_info": {
+          "package_name": "com.caresync.gec"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCorg-hNsw5YRsZ6oDFuip5dQ6C712h2R8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
