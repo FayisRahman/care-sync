@@ -111,19 +111,11 @@ class MemoryAccess {
           break;
         }
       }
-      alarms[alarmName].remove(id);
       isSingle = true;
     } else {
-      for (var alarm in alarms.keys) {
-        for (var currId in alarms[alarm]) {
-          if (currId == id) {
-            alarms[alarm].remove(currId);
-            break;
-          }
-        }
-      }
       isSingle = false;
     }
+    alarms[alarmName].remove(id);
     await prefs.setString("times", jsonEncode(times));
     await prefs.setString("alarms", jsonEncode(alarms));
     return isSingle;

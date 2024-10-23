@@ -143,6 +143,14 @@ class _MedicationScreenState extends State<MedicationScreen> {
       nextDosage = kGetFormattedTime(minTime, context);
       print(nextDosage);
       cards.add(MedicationCard(
+          onLongPress: () async {
+            //delete alarm
+            for (var alarmId in alarms[alarm]) {
+              if (await MemoryAccess.deleteAlarm(_prefs!, alarmId, alarm)) {
+                await Alarm.stop(alarmId);
+              }
+            }
+          },
           medicationName: alarm,
           noOfTimes: medTime.length,
           nextDosage: nextDosage,
