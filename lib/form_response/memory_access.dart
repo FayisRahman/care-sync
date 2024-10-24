@@ -103,6 +103,7 @@ class MemoryAccess {
       SharedPreferences prefs, int id, String alarmName) async {
     Map times = jsonDecode(prefs.getString("times") ?? "{}");
     Map alarms = jsonDecode(prefs.getString("alarms") ?? "{}");
+
     bool isSingle = false;
     if (countAlarmIdOccurrences(prefs, id) == 1) {
       for (var time in times.keys) {
@@ -116,6 +117,9 @@ class MemoryAccess {
       isSingle = false;
     }
     alarms[alarmName].remove(id);
+    if (alarms[alarmName].isEmpty) {
+      alarms.remove(alarmName);
+    }
     await prefs.setString("times", jsonEncode(times));
     await prefs.setString("alarms", jsonEncode(alarms));
     return isSingle;

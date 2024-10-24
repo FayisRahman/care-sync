@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../constants/constants.dart';
+import '../constants/models.dart';
 import '../networking/cloud_storage.dart';
 import '../widgets/raised_button.dart';
 import '../widgets/text_field.dart';
@@ -94,6 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           needHiding: true,
                           isError: false,
                           errorText: "password",
+                          keyboardType: TextInputType.name,
                         ),
                         Padding(
                           padding: const EdgeInsets.only(right: 10),

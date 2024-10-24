@@ -2,11 +2,16 @@ import 'package:caresync/form_response/form_response.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class HealthMetrics extends StatelessWidget {
+class HealthMetrics extends StatefulWidget {
   static const String id = "Health Metrics";
 
   const HealthMetrics({super.key});
 
+  @override
+  State<HealthMetrics> createState() => _HealthMetricsState();
+}
+
+class _HealthMetricsState extends State<HealthMetrics> {
   Widget _buildVitalSignRow(String label, String value, IconData icon) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -27,6 +32,14 @@ class HealthMetrics extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  FormResponse? formResponse;
+
+  @override
+  void initState() {
+    super.initState();
+    formResponse = Provider.of<FormResponse>(context, listen: false);
   }
 
   @override
@@ -58,7 +71,7 @@ class HealthMetrics extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 70,
             ),
             Row(
@@ -70,15 +83,15 @@ class HealthMetrics extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Text(
+                          const Text(
                             'Age',
                             style: TextStyle(
                                 fontSize: 16.0, fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(width: 8.0),
                           Text(
-                            '25',
-                            style: TextStyle(
+                            formResponse!.user!.age.toString(),
+                            style: const TextStyle(
                                 fontSize: 16.0, fontWeight: FontWeight.w400),
                           ),
                         ],
@@ -94,15 +107,15 @@ class HealthMetrics extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Text(
+                          const Text(
                             'Sex',
                             style: TextStyle(
                                 fontSize: 16.0, fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(width: 8.0),
                           Text(
-                            'Male',
-                            style: TextStyle(
+                            formResponse!.user!.gender!,
+                            style: const TextStyle(
                                 fontSize: 16.0, fontWeight: FontWeight.w400),
                           ),
                         ],

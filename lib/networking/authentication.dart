@@ -17,8 +17,13 @@ class Authentication {
           .then((value) async {
         await _cloud.collection("users").doc(credentials["pNo"]).set({
           "name": credentials["name"],
-          "pNo": credentials["pNo"],
           "password": credentials["password"],
+          "address": credentials["address"],
+          "dob": credentials["dob"],
+          "age": credentials["age"],
+          "pNo": credentials["pNo"],
+          "bloodGroup": credentials["bloodGroup"],
+          "related": credentials["related"],
           "parentNumber": credentials["parentNumber"],
           "role": "user",
         });

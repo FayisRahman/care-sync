@@ -5,6 +5,7 @@ import 'package:caresync/widgets/main_text_button.dart';
 import 'package:caresync/widgets/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import '../../constants/models.dart';
 import '../../widgets/drop_down_menu.dart';
 
 class DeleteCategoryScreen extends StatefulWidget {
@@ -18,11 +19,12 @@ class DeleteCategoryScreen extends StatefulWidget {
 
 class _DeleteCategoryScreenState extends State<DeleteCategoryScreen> {
   bool isUploading = false;
-  List<String> categories = [];
+  List<Category> categories = [];
   TextEditingController controller = TextEditingController();
 
   Future<void> getCategory() async {
     categories = await CloudStorage.getCategories();
+    print(categories);
   }
 
   bool isError = false;
@@ -52,11 +54,13 @@ class _DeleteCategoryScreenState extends State<DeleteCategoryScreen> {
                   controller: controller,
                   title: "Category Name",
                   onSuggestionSelected: (val) {
-                    controller.text = val;
-                    categoryName = val;
+                    setState(() {
+                      controller.text = val;
+                      categoryName = val;
+                    });
                   },
                   isError: isError,
-                  suggestions: categories,
+                  suggestions: categories.map((e) => e.name!).toList(),
                   type: "category",
                   onChanged: (val) {
                     setState(() {
@@ -70,7 +74,7 @@ class _DeleteCategoryScreenState extends State<DeleteCategoryScreen> {
                 MainTextButton(
                   onPressed: () async {
                     if (categoryName.isEmpty ||
-                        categories.contains(categoryName)) {
+                        categories.any((e) => e.name == categoryName)) {
                       setState(() {
                         isError = true;
                       });

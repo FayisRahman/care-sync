@@ -113,7 +113,8 @@ class _MedicationScreenState extends State<MedicationScreen> {
     }
     loadAlarms();
 
-    ringSubscription ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
+    ringSubscription ??=
+        Alarm.ringStream.stream.listen((data) => navigateToAlarmScreen(data));
     updateSubscription ??= Alarm.updateStream.stream.listen((_) {});
     createCards();
   }
@@ -150,6 +151,11 @@ class _MedicationScreenState extends State<MedicationScreen> {
                 await Alarm.stop(alarmId);
               }
             }
+            cards.remove(
+                cards.lastWhere((element) => element.medicationName == alarm));
+            setState(() {
+              cards;
+            });
           },
           medicationName: alarm,
           noOfTimes: medTime.length,

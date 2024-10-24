@@ -3,6 +3,8 @@ import 'package:caresync/networking/authentication.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../constants/models.dart';
+
 class CloudStorage {
   static final _cloud = FirebaseFirestore.instance;
 
@@ -28,12 +30,13 @@ class CloudStorage {
     }
   }
 
-  static dynamic addImageUrl(
-      String pno, String url, String filename, BuildContext context) async {
+  static dynamic addImageUrl(String pno, String url, String filename,
+      Map<String, int> vals, BuildContext context) async {
     try {
       await _cloud.collection("users").doc(pno).collection("uploads").add({
         "url": url,
         "filename": filename,
+        "vals": vals,
       });
     } catch (e) {
       kSnackBar(e.toString(), context);
@@ -70,23 +73,20 @@ class CloudStorage {
     return users;
   }
 
-  static Future<List<String>> getCategories() async {
-    List<String> categories = [];
+  static Future<List<Category>> getCategories() async {
+    List<Category> categories = [];
     await _cloud.collection("categories").get().then((val) {
       for (var doc in val.docs) {
-        categories.add(doc.data()["category"]);
+        categories.add(Category(doc.data()));
       }
     });
     return categories;
   }
 
-  static Future<void> addCategory(String category) async {
-    List<String> categories = [];
+  static Future<void> addCategory(Map<String, dynamic> categoryMap) async {
     await _cloud.collection("categories").add(
-      {
-        "category": category,
-      },
-    );
+          categoryMap,
+        );
   }
 
   static Future<bool> removeCategory(

@@ -30,6 +30,7 @@ class DataReportField extends StatelessWidget {
               readOnly: true,
               errorText: "",
               controller: typeController,
+              keyboardType: TextInputType.multiline,
               child: DropDownIconButton(
                 categories: categories,
                 onSelected: onSelected,
@@ -40,6 +41,7 @@ class DataReportField extends StatelessWidget {
           Flexible(
             child: LoginField(
               title: "Report Data",
+              keyboardType: TextInputType.number,
               onChanged: onChanged,
               errorText: "",
             ),

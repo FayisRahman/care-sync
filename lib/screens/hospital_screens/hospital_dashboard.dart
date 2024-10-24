@@ -59,13 +59,13 @@ class HospitalDashboard extends StatelessWidget {
                 },
                 title: "Add Categories",
               ),
-              // DashboardCard(
-              //   child: Image.asset("assets/images/remove.png"),
-              //   onTap: () {
-              //     Navigator.pushNamed(context, DeleteCategoryScreen.id);
-              //   },
-              //   title: "Remove Categories",
-              // ),
+              DashboardCard(
+                child: Image.asset("assets/images/remove.png"),
+                onTap: () {
+                  Navigator.pushNamed(context, DeleteCategoryScreen.id);
+                },
+                title: "Remove Categories",
+              ),
             ],
           ),
         ),

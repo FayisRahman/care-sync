@@ -5,6 +5,7 @@ import 'package:caresync/widgets/main_text_button.dart';
 import 'package:caresync/widgets/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import '../../constants/models.dart';
 import '../../widgets/drop_down_menu.dart';
 
 class AddCategoryScreen extends StatefulWidget {
@@ -18,15 +19,20 @@ class AddCategoryScreen extends StatefulWidget {
 
 class _AddCategoryScreenState extends State<AddCategoryScreen> {
   bool isUploading = false;
-  List<String> categories = [];
+  List<Category> categories = [];
   TextEditingController controller = TextEditingController();
 
   Future<void> getCategory() async {
     categories = await CloudStorage.getCategories();
+    print(categories);
   }
 
   bool isError = false;
   String categoryName = "";
+  String maxVal = "";
+  String minVal = "";
+  String tipLowVal = "";
+  String tipHighVal = "";
 
   @override
   void initState() {
@@ -45,7 +51,6 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 25),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 AutoCompleteField(
@@ -56,7 +61,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                     categoryName = val;
                   },
                   isError: isError,
-                  suggestions: categories,
+                  suggestions: categories.map((e) => e.name!).toList(),
                   type: "category",
                   onChanged: (val) {
                     setState(() {
@@ -65,6 +70,46 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                     });
                   },
                   isRequired: true,
+                ),
+                Row(
+                  children: [
+                    Flexible(
+                      child: LoginField(
+                        title: "Minimum value",
+                        keyboardType: TextInputType.number,
+                        onChanged: (val) {
+                          minVal = val;
+                        },
+                        errorText: "minimum value",
+                      ),
+                    ),
+                    Flexible(
+                      child: LoginField(
+                        title: "Maximum value",
+                        keyboardType: TextInputType.number,
+                        onChanged: (val) {
+                          maxVal = val;
+                        },
+                        errorText: "maximum value",
+                      ),
+                    ),
+                  ],
+                ),
+                LoginField(
+                  title: "Tips for low value",
+                  onChanged: (val) {
+                    tipLowVal = val;
+                  },
+                  errorText: "",
+                  keyboardType: TextInputType.multiline,
+                ),
+                LoginField(
+                  title: "Tips for high value",
+                  onChanged: (val) {
+                    tipHighVal = val;
+                  },
+                  errorText: "",
+                  keyboardType: TextInputType.multiline,
                 ),
                 const SizedBox(height: 20),
                 MainTextButton(
@@ -79,7 +124,15 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                         isUploading = true;
                       });
                       try {
-                        await CloudStorage.addCategory(categoryName);
+                        await CloudStorage.addCategory(
+                          {
+                            "category": categoryName,
+                            "max": maxVal,
+                            "min": minVal,
+                            "tipLow": tipLowVal,
+                            "tipHigh": tipHighVal,
+                          },
+                        );
                         kSnackBar("Category $categoryName uploaded", context);
                       } catch (e) {
                         kSnackBar(e.toString(), context);

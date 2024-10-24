@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:caresync/form_response/form_response.dart';
 import 'package:provider/provider.dart';
 
+import '../constants/models.dart';
+
 class LoadingScreen extends StatefulWidget {
   static const String id = "LoadingScreen";
 
@@ -78,11 +80,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      initialise();
-    });
-
     super.initState();
+    initialise();
   }
 
   @override

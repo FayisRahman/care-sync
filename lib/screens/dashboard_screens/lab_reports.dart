@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import '../../constants/models.dart';
 import '../../networking/cloud_storage.dart';
 import '../../widgets/drawer.dart';
 
@@ -36,8 +37,8 @@ class _LabReportState extends State<LabReport> {
 
   List<ExpandableCard> cards = [];
   List<CartesianSeries<GraphData, String>> series = [];
-  List<String> categories = [];
-  List<String> mainCategoryList = ["sugar", "cholesterol", "BP"];
+  List<Category> categories = [];
+  List<Category> mainCategoryList = [];
   String pno = "";
 
   int? _expandedIndex;
@@ -55,7 +56,10 @@ class _LabReportState extends State<LabReport> {
       yValueMapper: (GraphData sales, _) => sales.sales,
       name: items[index].itemName,
       pointColorMapper: (GraphData sales, _) {
-        return sales.sales > 40 ? Colors.red : Colors.green;
+        return sales.sales < categories[index].minVal! ||
+                sales.sales > categories[index].maxVal!
+            ? Colors.red
+            : Colors.green;
       },
       // Enable data label
       dataLabelSettings: const DataLabelSettings(isVisible: true),
@@ -137,31 +141,31 @@ class _LabReportState extends State<LabReport> {
     });
   }
 
-  void addItem(String vals, String types, String url, String date) {
-    List<String> valueList = vals.split(",");
-    List<String> typeList = types.split(",");
-    for (int i = 0; i < valueList.length; i++) {
-      if (categories.contains(mainCategoryList[int.parse(typeList[i])])) {
-        int index =
-            categories.indexOf(mainCategoryList[int.parse(typeList[i])]);
-        data[index].add(GraphData(date, double.parse(valueList[i])));
-        pdfButtons[index].add(
-          ExpandedButton(
-            title: date,
-            url: url,
-          ),
-        );
-      } else {
-        categories.add(mainCategoryList[int.parse(typeList[i])]);
-        pdfButtons.add([
-          ExpandedButton(
-            title: date,
-            url: url,
-          ),
-        ]);
-        data.add([GraphData(date, double.parse(valueList[i]))]);
-        items.add(ItemData(items.length - 1, items.length - 1, false,
-            mainCategoryList[int.parse(typeList[i])]));
+  void addItem(Map<String, dynamic> vals, String url, String date) {
+    for (String category in vals.keys) {
+      if (mainCategoryList.any((e) => e.name == category)) {
+        if (categories.any((e) => e.name == category)) {
+          int index = categories.indexWhere((e) => e.name == category);
+          data[index].add(GraphData(date, vals[category]!.toDouble()));
+          pdfButtons[index].add(
+            ExpandedButton(
+              title: date,
+              url: url,
+            ),
+          );
+        } else {
+          categories
+              .add(mainCategoryList.firstWhere((e) => e.name == category));
+          pdfButtons.add([
+            ExpandedButton(
+              title: date,
+              url: url,
+            ),
+          ]);
+          data.add([GraphData(date, vals[category]!.toDouble())]);
+          items.add(
+              ItemData(items.length - 1, items.length - 1, false, category));
+        }
       }
     }
   }
@@ -176,11 +180,10 @@ class _LabReportState extends State<LabReport> {
     dynamic result = await CloudStorage.getUploads(pno, context);
     length = result.length;
     for (var doc in result) {
-      String types = doc["filename"].toString().split("-")[0];
-      String value = doc["filename"].toString().split("-")[1];
-      dateMilli = int.parse(doc["filename"].toString().split("-")[2]);
+      Map<String, dynamic> vals = doc["vals"];
+      dateMilli = int.parse(doc["filename"].toString());
       date = DateTime.fromMillisecondsSinceEpoch(dateMilli);
-      addItem(value, types, doc["url"], kGetDate(date));
+      addItem(vals, doc["url"], kGetDate(date));
     }
 
     debugPrint("successful ${itemsData.length}");
@@ -192,11 +195,9 @@ class _LabReportState extends State<LabReport> {
   }
 
   Future<void> initialise() async {
-    print("started");
     mainCategoryList = await CloudStorage.getCategories();
     print(categories);
     await setGraphData();
-    print("two completed");
     if (length == 0) return;
     setCards();
     series = [getLineSeriesData(0)];
@@ -207,7 +208,6 @@ class _LabReportState extends State<LabReport> {
     // TODO: implement initState
     super.initState();
     pno = Provider.of<FormResponse>(context, listen: false).pno;
-    print("hello");
     initialise();
   }
 

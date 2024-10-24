@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class AutoCompleteField extends StatelessWidget {
-  final TextEditingController controller;
   final String title;
   final Function(String) onSuggestionSelected;
+  final TextEditingController controller;
   final bool isError;
   final List<String> suggestions;
   final String type;
@@ -13,7 +13,6 @@ class AutoCompleteField extends StatelessWidget {
 
   const AutoCompleteField({
     super.key,
-    required this.controller,
     required this.title,
     required this.onSuggestionSelected,
     required this.isError,
@@ -21,6 +20,7 @@ class AutoCompleteField extends StatelessWidget {
     required this.type,
     required this.onChanged,
     required this.isRequired,
+    required this.controller,
   });
 
   @override
@@ -28,6 +28,7 @@ class AutoCompleteField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15),
       child: TypeAheadField(
+        controller: controller,
         builder: (BuildContext context, TextEditingController controller,
             FocusNode focusNode) {
           return TextField(
@@ -71,7 +72,9 @@ class AutoCompleteField extends StatelessWidget {
             title: Text(suggestion),
           );
         },
-        onSelected: onSuggestionSelected,
+        onSelected: (val) {
+          onSuggestionSelected(val);
+        },
         emptyBuilder: (BuildContext context) {
           return isRequired
               ? Padding(

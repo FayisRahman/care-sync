@@ -118,11 +118,10 @@ class _AddMedicationRemainderState extends State<AddMedicationRemainder> {
       assetAudioPath: assetAudio,
       warningNotificationOnKill: Platform.isIOS,
       notificationSettings: NotificationSettings(
-        title: 'Medicine Intake Reminder',
-        body: alarmName,
-        icon: 'ic_launcher',
-        stopButton: "Stop"
-      ),
+          title: 'Medicine Intake Reminder',
+          body: alarmName,
+          icon: 'ic_launcher',
+          stopButton: "Stop"),
     );
     return alarmSettings;
   }
@@ -137,7 +136,11 @@ class _AddMedicationRemainderState extends State<AddMedicationRemainder> {
       await MemoryAccess.addAlarmId(_prefs!, id, time);
     }
     await MemoryAccess.addNewAlarm(_prefs!, id, alarmName);
-    newAlarmName += ",$alarmName";
+    if (newAlarmName.isNotEmpty) {
+      newAlarmName += ",$alarmName";
+    } else {
+      newAlarmName = alarmName;
+    }
   }
 
   Future<bool> createAlarmSettings() async {

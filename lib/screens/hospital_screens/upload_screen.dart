@@ -13,6 +13,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 
+import '../../constants/models.dart';
+
 class UploadScreen extends StatefulWidget {
   static const String id = "UploadScreen";
 
@@ -32,8 +34,9 @@ class _UploadScreenState extends State<UploadScreen> {
   String typeValue = "";
   String name = "";
   List<String> users = [];
-  List<String> categories = ["BP", "Cholesterol", "Sugar"];
+  List<Category> categories = [];
   Map<String, int> mapVal = {"BP": 0, "Cholesterol": 1, "Sugar": 2};
+  List<String> categoryList = [];
   List<TextEditingController> typeControllers = [];
   List<DataReportField> fields = [];
   List<String> values = [];
@@ -41,10 +44,12 @@ class _UploadScreenState extends State<UploadScreen> {
   String valRes = "";
   String typeRes = "";
   DateTime selectedDateTime = DateTime.now();
+  Map<String, int> vals = {};
 
   Future<void> _pickDocument() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.any, // This allows any type of document
+      type: FileType.custom,
+      allowedExtensions: ["pdf"],
     );
 
     if (result != null) {
@@ -59,6 +64,15 @@ class _UploadScreenState extends State<UploadScreen> {
     }
   }
 
+  void createMap() {
+    vals = {};
+    for (int i = 0; i < fields.length; i++) {
+      if (values[i].isNotEmpty) {
+        vals[types[i]] = int.parse(values[i]);
+      }
+    }
+  }
+
   Future<void> _uploadDocumentToFirebase(String docType) async {
     if (_documentFile == null) return;
 
@@ -67,9 +81,8 @@ class _UploadScreenState extends State<UploadScreen> {
     });
 
     try {
-      convertToString();
       String fileName =
-          'userReports/$pno/$typeRes-$valRes-${selectedDateTime.millisecondsSinceEpoch}';
+          'userReports/$pno/${selectedDateTime.millisecondsSinceEpoch}';
       print(fileName);
       Reference firebaseStorageRef =
           FirebaseStorage.instance.ref().child(fileName);
@@ -82,9 +95,9 @@ class _UploadScreenState extends State<UploadScreen> {
       setState(() {
         _imageUrl = downloadUrl;
       });
-
+      createMap();
       await CloudStorage.addImageUrl(
-          pno, downloadUrl, fileName.split("/")[2], context);
+          pno, downloadUrl, fileName.split("/")[2], vals, context);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -120,24 +133,24 @@ class _UploadScreenState extends State<UploadScreen> {
     }
   }
 
-  void convertToString() {
-    valRes = "";
-    typeRes = "";
-    for (String val in values) {
-      if (valRes.isNotEmpty) {
-        valRes += ",${val.trim()}";
-      } else {
-        valRes += val.trim();
-      }
-    }
-    for (String val in types) {
-      if (typeRes.isNotEmpty) {
-        typeRes += ",${mapVal[val]}";
-      } else {
-        typeRes += "${mapVal[val]}";
-      }
-    }
-  }
+  // void convertToString() {
+  //   valRes = "";
+  //   typeRes = "";
+  //   for (String val in values) {
+  //     if (valRes.isNotEmpty) {
+  //       valRes += ",${val.trim()}";
+  //     } else {
+  //       valRes += val.trim();
+  //     }
+  //   }
+  //   for (String val in types) {
+  //     if (typeRes.isNotEmpty) {
+  //       typeRes += ",${mapVal[val]}";
+  //     } else {
+  //       typeRes += "${mapVal[val]}";
+  //     }
+  //   }
+  // }
 
   void addField() {
     typeControllers.add(TextEditingController());
@@ -147,7 +160,7 @@ class _UploadScreenState extends State<UploadScreen> {
     fields.add(
       DataReportField(
         typeController: typeControllers[currIndex],
-        categories: categories,
+        categories: categoryList,
         selectedTypes: types,
         onSelected: (val) {
           typeControllers[currIndex].text = val;
@@ -169,8 +182,9 @@ class _UploadScreenState extends State<UploadScreen> {
   Future<void> addCategories() async {
     categories = await CloudStorage.getCategories();
     for (int i = 0; i < categories.length; i++) {
-      mapVal[categories[i]] = i;
+      categoryList.add(categories[i].name!);
     }
+    print(categories);
     setState(() {
       categories;
       mapVal;
@@ -211,6 +225,7 @@ class _UploadScreenState extends State<UploadScreen> {
                   onChanged: (String val) {},
                   readOnly: true,
                   errorText: "",
+                  keyboardType: TextInputType.multiline,
                   controller: _nameController,
                   child: DropDownIconButton(
                       categories: users,

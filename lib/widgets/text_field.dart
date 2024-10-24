@@ -13,6 +13,7 @@ class LoginField extends StatefulWidget {
   TextEditingController? controller;
   bool readOnly;
   Widget? child;
+  TextInputType? keyboardType;
 
   LoginField({
     super.key,
@@ -25,6 +26,7 @@ class LoginField extends StatefulWidget {
     this.readOnly = false,
     this.onDateChanged,
     this.child,
+    this.keyboardType = TextInputType.text,
   });
 
   @override
@@ -70,15 +72,13 @@ class _LoginFieldState extends State<LoginField> {
             controller: widget.controller,
             readOnly: widget.readOnly,
             maxLength: widget.title == "Phone Number" ? 10 : null,
-            keyboardType: widget.title == "Phone Number"
-                ? TextInputType.number
-                : TextInputType.text,
+            minLines: 1,
+            keyboardType: widget.keyboardType,
             inputFormatters: [
               //if widget.title is phone number then allow digits only otherwise allow all alphabets and digits
-              if (widget.title == "Phone Number")
+              if (widget.keyboardType == TextInputType.number)
                 FilteringTextInputFormatter.digitsOnly,
             ],
-            textInputAction: TextInputAction.newline,
             style: const TextStyle(
               fontWeight: FontWeight.w700,
             ),
